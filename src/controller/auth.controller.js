@@ -3,7 +3,7 @@ import { registerUser } from "../service/auth.service.js";
 import { loginUser } from "../service/auth.service.js";
 import { ApiResponse } from "../util/ApiResponse.js";
 import { asyncHandler } from "../util/asyncHandler.js";
-
+import { sendRegistrationEmail } from "../service/email.service.js";
 
 
 /**
@@ -15,11 +15,15 @@ const userRegister=asyncHandler(async(req,res)=>{
 const {email,password,username}=req.body
 
 const user=await registerUser({email,password,username})
-
+await sendRegistrationEmail(user.email, user.username)
 return res.status(201)
 .json(new ApiResponse(201,"User registered Successfully",{user}))
 
+
+
+
 })
+
 
 const Options={
     httpOnly:true,
