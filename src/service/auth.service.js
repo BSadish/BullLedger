@@ -2,6 +2,7 @@
 import { User } from "../model/user.model.js"
 import { ApiError } from "../util/ApiError.js";
 import { generateAccessToken, generateRefreshToken } from "../util/token.js";
+
 export const registerUser=async({email,password,username})=>{
 
 const isExists=await User.findOne({email})
