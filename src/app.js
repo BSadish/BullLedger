@@ -13,6 +13,7 @@ app.use(coookieParser())
  */
 import accountRouter from "./route/account.routes.js"
 import authRouter from "./route/auth.routes.js"
+import transactionRoutes from "./route/transaction.routes.js"
 
 
 /**
@@ -20,5 +21,6 @@ import authRouter from "./route/auth.routes.js"
  */
 app.use("/api/auth",authRouter)
 app.use ("/api/accounts",accountRouter)
+app.use("/api/transaction",transactionRoutes)
 
 export {app}
