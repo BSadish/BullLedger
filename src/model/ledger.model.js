@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const legerSchema=new mongoose.Schema(
+const ledgerSchema=new mongoose.Schema(
     {
         account:{
             type:mongoose.Schema.Types.ObjectId,
@@ -36,6 +36,9 @@ const legerSchema=new mongoose.Schema(
     ledgerSchema.pre('deleteOne',preventLedgerModification)
     ledgerSchema.pre('remove',preventLedgerModification)
     ledgerSchema.pre('deleteMany',preventLedgerModification)
+    ledgerSchema.pre('updateMany',preventLedgerModification)
+    ledgerSchema.pre('findOneAndDelete',preventLedgerModification)
+    ledgerSchema.pre('findOneAndReplace',preventLedgerModification)
 
 
-    export const Ledger=mongoose.model("Ledger",legerSchema)
+    export const Ledger=mongoose.model("Ledger",ledgerSchema)
