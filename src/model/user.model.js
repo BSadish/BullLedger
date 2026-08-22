@@ -22,6 +22,12 @@ password:{
     required:[true,"Password is requied for creating an account"],
     minlength:[6,"Password should be more than 6 character"],
     select:false // it exclude the password to be selected when extracting user queries or user data
+},
+systemUser:{
+    type:Boolean,
+    default:false,
+    immutable:true,
+    select:false
 }
 
 
