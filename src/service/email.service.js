@@ -75,4 +75,40 @@ const html = `
 }
 
 
-export {sendEmail, sendRegistrationEmail}
+async function sendTransaction(userEmail,name,amount,toAccount){
+  const subject='Transaction is successfull'
+  const text= `Hello ${name},\n\nYour transaction of $${amount} to account ${toAccount} was completed successfully.\n\nThank you for choosing our service!`;
+  const html=`
+    <div style="font-family: sans-serif; max-width: 400px; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px;">
+      <h3 style="color: #10b981; margin-top: 0;">✓ Transaction Successful</h3>
+      <p>Hi <b>${name}</b>, your transfer was completed.</p>
+      <div style="background: #f8fafc; padding: 12px; border-radius: 6px; line-height: 1.6;">
+        <div><b>Amount:</b> $${amount}</div>
+        <div><b>Recipient:</b> ${toAccount}</div>
+      </div>
+    </div>
+  `;
+
+  await sendEmail(userEmail,subject,text,html)
+}
+async function sendTransactionFailureEmail(userEmail,name,amount,toAccount){
+  const subject='Action Required: Transaction Failed';
+  const text=`Hi ${name}, your transfer of $${amount} to account ${toAccount} failed. No money was debited from your account.`;
+  const html=`
+    <div style="font-family: sans-serif; max-width: 400px; padding: 16px; border: 1px solid #fee2e2; border-top: 4px solid #ef4444; border-radius: 8px;">
+      <h3 style="color: #ef4444; margin-top: 0;">⚠️ Transaction Failed</h3>
+      <p>Hi <b>${name}</b>, we couldn't process your transfer.</p>
+      <div style="background: #f8fafc; padding: 12px; border-radius: 6px; line-height: 1.6; font-size: 14px;">
+        <div><b>Amount:</b> $${amount}</div>
+        <div><b>Recipient:</b> ${toAccount}</div>
+      </div>
+      <p style="background: #fef2f2; color: #991b1b; padding: 8px 12px; border-radius: 4px; font-size: 13px;">
+        <b>Note:</b> No funds were debited from your account.
+      </p>
+    </div>
+  `;
+
+  await sendEmail(userEmail,subject,text,html)
+}
+
+export {sendEmail, sendRegistrationEmail, sendTransaction, sendTransactionFailureEmail}
