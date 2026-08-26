@@ -6,6 +6,7 @@ import { ApiError } from "../util/ApiError.js";
 import { Account } from "../model/account.model.js";
 import { ApiResponse } from "../util/ApiResponse.js";
 import mongoose from "mongoose";
+import { User } from "../model/user.model.js";
 /**
  * - Create new Transaction
  */
@@ -17,6 +18,7 @@ const createTransaction=asyncHandler(async(req,res)=>{
 
     const fromUserAccount=await Account.findOne({_id:fromAccount})
     const toUserAccount=await Account.findOne({_id:toAccount})
+
 
     if(!fromUserAccount || !toUserAccount){
         throw new ApiError(400,"Invalid fromAccount or toAccount")
@@ -106,6 +108,7 @@ return res.status(201)
 
 
 const createInitialFundsTransaction=asyncHandler(async(req,res)=>{
+   
     const {toAccount, amount, idempotencyKey}=req.body
      if(!amount || !toAccount ||  !idempotencyKey){
         throw new ApiError(400," toAccount,amount, and idempotencyKey required")
@@ -116,10 +119,13 @@ const createInitialFundsTransaction=asyncHandler(async(req,res)=>{
     if(!toUserAccount){
         throw new ApiError(400,"Invalid toUserAccount")
     }
-
-    const fromUserAccount=await Account.findOne({systemUser:true,user:req.user._id})
+  
+const systemUser=await User.findOne({systemUser:true})
+console.log(systemUser)
+    const fromUserAccount=await Account.findOne({user:systemUser._id, status:"ACTIVE"})
+    console.log(fromUserAccount)
     if(!fromUserAccount){
-        throw new ApiError()
+        throw new ApiError(400,"invalide fromUserAccount")
     }
 
     const session = await mongoose.startSession()
