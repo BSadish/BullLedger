@@ -1,5 +1,5 @@
-import { User } from "../model/user.model"
-import { ApiError } from "../util/ApiError"
+import { User } from "../model/user.model.js"
+import { ApiError } from "../util/ApiError.js"
 import jwt from "jsonwebtoken"
 
 export const authSystemUserMiddleware=async(req,res,next)=>{
@@ -15,7 +15,7 @@ export const authSystemUserMiddleware=async(req,res,next)=>{
         if(!user.systemUser){
             throw new ApiError(403,"Frobidden access, not a system user")
         }
-
+console.log("Hello World")
         req.user=user
         next()
     } catch (error) {
