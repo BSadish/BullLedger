@@ -120,10 +120,9 @@ const createInitialFundsTransaction=asyncHandler(async(req,res)=>{
         throw new ApiError(400,"Invalid toUserAccount")
     }
   
-const systemUser=await User.findOne({systemUser:true})
-console.log(systemUser)
-    const fromUserAccount=await Account.findOne({user:systemUser._id, status:"ACTIVE"})
-    console.log(fromUserAccount)
+
+    const fromUserAccount=await Account.findOne({user:req.user._id})
+    
     if(!fromUserAccount){
         throw new ApiError(400,"invalide fromUserAccount")
     }
@@ -131,7 +130,7 @@ console.log(systemUser)
     const session = await mongoose.startSession()
     session.startTransaction()
 
-    const transaction = new transactionModel({
+    const transaction = new Transaction({
         fromAccount: fromUserAccount._id,
         toAccount,
         amount,
@@ -139,14 +138,14 @@ console.log(systemUser)
         status: "PENDING"
     })
 
-    const debitLedgerEntry = await ledgerModel.create([ {
+    const debitLedgerEntry = await Ledger.create([ {
         account: fromUserAccount._id,
         amount: amount,
         transaction: transaction._id,
         type: "DEBIT"
     } ], { session })
 
-    const creditLedgerEntry = await ledgerModel.create([ {
+    const creditLedgerEntry = await Ledger.create([ {
         account: toAccount,
         amount: amount,
         transaction: transaction._id,
