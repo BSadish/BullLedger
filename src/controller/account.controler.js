@@ -20,6 +20,27 @@ const createAccount=asyncHandler(async(req,res)=>{
     .json(new ApiResponse(201,"User Account Created",{account}))
 })
 
+const getUserAccount=asyncHandler(async(req,res)=>{
+
+   const accounts=await Account.find({user:req.user._id})
+
+   res.status(200).json(new ApiResponse(200,"Account data fetched successfully",accounts))
+
+})
 
 
-export {createAccount}
+const getAccountBalance=asyncHandler(async(req,res)=>{
+const {accountId}=req.params;
+const account=await Account.findOne({_id:accountId,
+    user:req.user._id
+})
+if(!account){
+    throw new ApiError(404,"Account not found")
+}
+const balance=await account.getBalance()
+res.status(200).json(new ApiResponse(200,"User Account balance Fetched",{balance}))
+})
+
+
+
+export {createAccount, getUserAccount,getAccountBalance}
