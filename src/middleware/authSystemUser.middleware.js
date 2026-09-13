@@ -15,7 +15,6 @@ export const authSystemUserMiddleware=async(req,res,next)=>{
         if(!user.systemUser){
             throw new ApiError(403,"Frobidden access, not a system user")
         }
-console.log("Hello World")
         req.user=user
         next()
     } catch (error) {
