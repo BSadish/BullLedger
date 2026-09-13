@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middleware/auth.middleware.js";
-import { createAccount } from "../controller/account.controler.js";
+import { createAccount, getAccountBalance, getUserAccount } from "../controller/account.controler.js";
 
 const router=Router()
 
@@ -12,5 +12,17 @@ const router=Router()
 router.post('/',verifyJWT,createAccount)
 
 
+/**
+ *  - GET /api/accounts/
+ * - Get all accounts of the logged-in user
+ * - Protected Route
+ */
+router.get('/',verifyJWT,getUserAccount)
+
+/**
+ * - GET /api/accounts/balance/:accountId
+ * - 
+ */
+router.get("/balance/:accountId",verifyJWT,getAccountBalance)
 
 export default router
