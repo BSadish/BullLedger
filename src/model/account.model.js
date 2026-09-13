@@ -32,39 +32,52 @@ const accountSchema=new mongoose.Schema(
     accountSchema.index({user:1,status:1})
 
     accountSchema.methods.getBalance=async function(){
-        const balanceData=await Ledger.aggregate(
-            [
-                {$match:{account:this._id}},
-                {
-                    $group:{
-                        _id:null,
-                        totalDebit:{
-                            $sum:{
-                                $cond:[
-                                   { $eq:["$type","DEBIT"]},
-                                   "$amount",0
-                                
-                                ]
-                            }
-                        },
-                        totalCredit:{
-                            $sum:{
-                                 $cond:[
-                                   { $eq:["$type","CREDIT"]},
-                                   "$amount",0
-                                
-                                ]
-                            }
-                        }
-                    }
-                },
-               { 
-                $project:{
-                    _id:0,
-                    balance:{$subtract:["$totalCredit","$totalDebit"]}
-                }}
-            ]
-        )
+        const balanceData = await Ledger.aggregate([
+    {
+        $match: {
+            account: this._id
+        }
+    },
+    {
+        $group: {
+            _id: null,
+
+            totalDebit: {
+                $sum: {
+                    $cond: [
+                        { $eq: ["$type", "DEBIT"] },
+                        "$amount",
+                        0
+                    ]
+                }
+            },
+
+            totalCredit: {
+                $sum: {
+                    $cond: [
+                        { $eq: ["$type", "CREDIT"] },
+                        "$amount",
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            totalDebit: 1,
+            totalCredit: 1,
+            balance: {
+                $subtract: [
+                    "$totalCredit",
+                    "$totalDebit"
+                ]
+            }
+        }
+    }
+]);
+        console.log(balanceData)
         if(balanceData.length===0){
             return 0
         }
