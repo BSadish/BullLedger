@@ -12,6 +12,8 @@ import { User } from "../model/user.model.js";
  */
 const createTransaction=asyncHandler(async(req,res)=>{
     const {fromAccount,toAccount,amount,idempotencyKey}=req.body
+
+    console.log(idempotencyKey)
     if(!fromAccount || !toAccount || !amount || !idempotencyKey){
         throw new ApiError(400,"FromAccount, toAccount,Amount, and idempotencyKey required")
     }
@@ -59,6 +61,7 @@ const createTransaction=asyncHandler(async(req,res)=>{
     /**
      * 4. Checking the sender balance
      */
+    
     const senderBalance=await fromUserAccount.getBalance()
     console.log(senderBalance)
     if(senderBalance<amount){
@@ -71,27 +74,30 @@ throw new ApiError(400,`Insufficient balance. Current balance is ${senderBalance
 
 const session=await mongoose.startSession()
 session.startTransaction()
-
+console.log(fromAccount)
+console.log(toAccount)
+console.log(idempotencyKey)
 
 const transaction=await Transaction.create({
     fromAccount,
     toAccount,
-    idempotencyKey,
-    status:"PENDING"
+    idempotencyKey ,
+    status:"PENDING",
+    amount
 },{session})
 
 const debitLedgerEntry=await Ledger.create({
-    account:toAccount,
+    account:fromAccount,
     amount:amount,
-    transaction:transaction_id,
+    transaction:transaction._id,
     type:"CREDIT"
 
 },{session})
 const creditLedgerEntry=await Ledger.create({
     account:toAccount,
     amount:amount,
-    transaction:transaction_id,
-    type:"CREDIT"
+    transaction:transaction._id,
+    type:"DEBIT"
 
 },{session})
 
