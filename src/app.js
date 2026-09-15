@@ -8,7 +8,7 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}))
 app.use(coookieParser())
 
 app.get('/',(req,res)=>{
-    console.log("My first deployment project")
+    res.send("My first deployment project")
 })
 
 /**
