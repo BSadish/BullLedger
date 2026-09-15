@@ -4,6 +4,8 @@ import { loginUser } from "../service/auth.service.js";
 import { ApiResponse } from "../util/ApiResponse.js";
 import { asyncHandler } from "../util/asyncHandler.js";
 import { sendRegistrationEmail } from "../service/email.service.js";
+import { ApiError } from "../util/ApiError.js";
+import { Blacklist } from "../model/blacklist.model.js";
 
 
 /**
@@ -22,6 +24,31 @@ return res.status(201)
 
 
 
+})
+
+/**
+ * - User Logout Controller
+ * - POST /api/auth/logout
+ */
+
+const userLogOut=asyncHandler(async(req,res)=>{
+    const token=req.cookies.accessToken || req.headers.authorization?.replace("Bearer","")
+
+    if(!token){
+       return res.status(200).json(new ApiResponse(200,"User Logged out hello hi successfully"))
+    }
+
+    res.cookie("token","")
+    await Blacklist.create({
+        token:token
+    })
+
+    return res.status(200)
+
+    .json(new ApiResponse(200,
+    
+        "User Loggedout hello successfully"
+    ))
 })
 
 
@@ -49,4 +76,4 @@ return res
 
 
 
-export {userRegister,userLogin}
+export {userRegister,userLogin,userLogOut}
