@@ -1,3 +1,4 @@
+import { Blacklist } from "../model/blacklist.model.js";
 import { User } from "../model/user.model.js";
 import { ApiError } from "../util/ApiError.js";
 import jwt from "jsonwebtoken"
@@ -8,6 +9,14 @@ const verifyJWT = async (req, res, next) => {
 
     if (!token) {
         throw new ApiError(401, "Authentication required")
+    }
+
+    const isBlacklisted=await Blacklist.findOne({token})
+
+
+    if(isBlacklisted){
+   
+        return res.status(401).json({message:"Unauthorized access, token is missing"})
     }
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
