@@ -12,7 +12,7 @@ import { User } from "../model/user.model.js";
  */
 const createTransaction=asyncHandler(async(req,res)=>{
     const {fromAccount,toAccount,amount,idempotencyKey}=req.body
-
+console.log("Hello WOrld")
     console.log(idempotencyKey)
     if(!fromAccount || !toAccount || !amount || !idempotencyKey){
         throw new ApiError(400,"FromAccount, toAccount,Amount, and idempotencyKey required")
@@ -73,39 +73,49 @@ throw new ApiError(400,`Insufficient balance. Current balance is ${senderBalance
      */
 
 const session=await mongoose.startSession()
-session.startTransaction()
-console.log(fromAccount)
-console.log(toAccount)
-console.log(idempotencyKey)
 
-const transaction=await Transaction.create({
+try {
+    session.startTransaction()
+const transaction=new Transaction({
     fromAccount,
     toAccount,
     idempotencyKey ,
     status:"PENDING",
     amount
-},{session})
+})
 
-const debitLedgerEntry=await Ledger.create({
-    account:fromAccount,
-    amount:amount,
-    transaction:transaction._id,
-    type:"CREDIT"
 
-},{session})
-const creditLedgerEntry=await Ledger.create({
-    account:toAccount,
-    amount:amount,
-    transaction:transaction._id,
-    type:"DEBIT"
 
-},{session})
+
+const ledgerEntries = await Ledger.create([
+    {
+        account: fromAccount,
+        amount,
+        transaction: transaction._id,
+        type: "DEBIT"
+    },
+    {
+        account: toAccount,
+        amount,
+        transaction: transaction._id,
+        type: "CREDIT"
+    }
+], { session, ordered:true })
 
 transaction.status="COMPLETED"
 await transaction.save({session})
-
 await session.commitTransaction()
-session.endSession()
+
+} catch (error) {
+    // throw new ApiError(400,{message:error.message})
+      await session.abortTransaction();
+}
+finally{
+
+await session.endSession()
+}
+
+
 
 /**
  * 10. Sending email notification to user
