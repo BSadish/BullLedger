@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { userLogin, userRegister } from "../controller/auth.controller.js";
+import { userLogin, userLogOut, userRegister } from "../controller/auth.controller.js";
+import { verifyJWT } from "../middleware/auth.middleware.js";
 
 const router=Router()
 
@@ -7,5 +8,9 @@ const router=Router()
 router.post("/register",userRegister)
 router.post("/login",userLogin)
 
+/**
+ * - POST /api/auth/logout
+ */
+router.post("/logout",verifyJWT,userLogOut)
 
 export default router
