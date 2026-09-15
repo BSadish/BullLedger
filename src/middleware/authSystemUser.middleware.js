@@ -9,6 +9,12 @@ export const authSystemUserMiddleware=async(req,res,next)=>{
         throw new ApiError(401,"Unauthorized access, token missing")
     }
 
+    const isBlacklisted=await Blacklist.findOne({token})
+    
+        if(isBlacklisted){
+            throw new ApiError(401).json(401,"Unauthorized access, token is invalid")
+        }
+
     try {
         const decoded=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)
         const user=await User.findById(decoded._id).select("+systemUser")
