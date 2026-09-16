@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken"
 
 const verifyJWT = async (req, res, next) => {
 
-    const token = req.cookies.accessToken || req.headers.authorization?.replace("Bearer", "")
+    const token = req.cookies.accessToken || req.headers.authorization?.split(" ")[1]
 
     if (!token) {
         throw new ApiError(401, "Authentication required")
